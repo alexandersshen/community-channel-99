@@ -26,7 +26,7 @@ If you just want to “flip channels” and land on *The Simpsons* or a random o
 
 ```bash
 # 1. Clone this repo
-git clone https://github.com/yourname/community-channel-99.git
+git clone https://github.com/alexandersshen/community-channel-99.git
 cd community-channel-99
 
 # 2. Install requirements
