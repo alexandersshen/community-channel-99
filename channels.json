@@ -1,0 +1,18 @@
+{
+  "channels": [
+    {
+      "id": "cartoons",
+      "name": "Cartoons",
+      "rotation": "random",
+      "path": "media/cartoons",
+	  "commercials": true
+    },
+    {
+      "id": "movies",
+      "name": "Movies",
+      "rotation": "random",
+      "path": "media/movies",
+	  "commercials": false
+    }
+  ]
+}

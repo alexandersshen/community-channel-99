@@ -1,0 +1,18 @@
+<html>
+<head>
+  <title>Community Channel 99</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+	<div class="content">
+	  <h1>Choose Your Channel</h1>
+	  <div class="remote">
+	    {% for c in channels %}
+	      <a href="/watch/{{ c.id }}" class="remote-button">
+	        {{ loop.index }}<br>{{ c.name }}
+	      </a>
+	    {% endfor %}
+	  </div>
+	 </div>
+</body>
+</html>

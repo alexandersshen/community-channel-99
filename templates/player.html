@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+<head>
+  <title>{{ channel.name }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="tv-mode">
+
+  <!-- Back to Channel Index -->
+  <a href="/" class="back-link">⬅ Channel Index</a>
+
+  <!-- TV Frame -->
+  <div class="tv-frame">
+    <div class="tv-screen">
+      <!-- Notice: no <source> inside -->
+      <video id="tv-video" autoplay playsinline crossorigin="anonymous"></video>
+    </div>
+    <div class="tv-label">{{ channel.name }}</div>
+    <div class="now-playing">🎬 Now Playing: <span id="now-title">{{ metadata.filename }}</span></div>
+  </div>
+
+  <!-- Info Toggle Button -->
+  <button id="info-toggle">ℹ️ Info</button>
+  
+  <!-- remote control -->
+	<div class="quick-links">
+	  <h3>📺 Quick Channels</h3>
+	  <div class="channel-buttons">
+		{% for ch in channels %}
+		  <a class="channel-btn {% if ch.id == channel.id %}active{% endif %}"
+		     href="{{ url_for('watch', channel_id=ch.id) }}">
+		    {{ ch.name }}
+		  </a>
+		{% endfor %}
+	  </div>
+	</div>
+
+  <!-- Metadata Panel -->
+  <div class="metadata-panel collapsed" id="metadata-panel">
+    <h2>📄 File Info</h2>
+    <p><strong>File:</strong> <span id="meta-filename">{{ metadata.filename | default("N/A") }}</span></p>
+    <p><strong>Format:</strong> <span id="meta-format">{{ metadata.format_name | default("N/A") }}</span></p>
+    <p><strong>Duration:</strong> <span id="meta-duration">{{ (metadata.duration | float / 60) | round(1) }} min</span></p>
+    <p><strong>Bitrate:</strong> <span id="meta-bitrate">{{ metadata.bit_rate | default("N/A") }}</span></p>
+	<p><strong>Progress:</strong> <span id="meta-progress">N/A</span></p>
+	<p><strong>Next:</strong> <span id="meta-next">N/A</span></p>
+  </div>
+
+  <script>
+    const video = document.querySelector("#tv-video");
+    const channelId = "{{ channel.id }}";
+    const panel = document.getElementById("metadata-panel");
+    const toggleBtn = document.getElementById("info-toggle");
+
+	// Initialize video source + offset
+	loadVideo("{{ current_file }}", {{ offset }}, {{ duration }});
+	
+	// syncWithServer first - to get "next"
+	syncWithServer(false);
+
+    // Toggle info panel
+    toggleBtn.addEventListener("click", () => {
+      panel.classList.toggle("collapsed");
+    });
+
+    // When a video ends, re-sync to server
+    video.addEventListener("ended", syncWithServer);
+
+    // Periodic resync (every 5 min)
+    setInterval(syncWithServer, 300000);
+
+	function syncWithServer(updateVideo = true) {
+	  console.log("syncWithServer() called");
+	  fetch(`/now/${channelId}`)
+	    .then(res => res.json())
+	    .then(now => {
+	      console.log("Server responded with:", now);
+
+	      // Only reload video if we explicitly want to
+	      if (updateVideo) {
+	        loadVideo(now.file, now.offset, now.duration);
+	      }
+
+	      // Update "Next" info regardless
+	      const nextTitle = now.next_file
+	        ? now.next_file.replace(/\.[^/.]+$/, "")
+	        : "N/A";
+
+	      const nextEl = document.getElementById("meta-next");
+	      if (nextEl) {
+	        nextEl.textContent =
+	          nextTitle + (now.next_time ? " @ " + now.next_time : "");
+	      }
+	    });
+	}
+	
+	function loadVideo(filename, offset = 0, duration = null) {
+	  video.src = "/media/" + filename;
+	  video.load();
+	  video.currentTime = offset;
+	  video.play();
+
+	  // Update Now Playing
+	  const cleanName = filename.split("/").pop().replace(/\.[^/.]+$/, "");
+	  document.getElementById("now-title").textContent = cleanName;
+
+	  // Refresh metadata box
+	  fetch("/metadata/" + filename)
+	    .then(res => res.json())
+	    .then(meta => {
+	      document.getElementById("meta-filename").textContent = meta.filename || "N/A";
+	      document.getElementById("meta-format").textContent = meta.format_name || "N/A";
+	      document.getElementById("meta-duration").textContent =
+	        meta.duration ? (meta.duration/60).toFixed(1) + " min" : "N/A";
+	      document.getElementById("meta-bitrate").textContent = meta.bit_rate || "N/A";
+
+	      // Show progress percent if we have a duration
+	      if (duration) {
+	        const pct = ((offset / duration) * 100).toFixed(1);
+	        document.getElementById("meta-progress").textContent = pct + "%";
+	      } else {
+	        document.getElementById("meta-progress").textContent = "N/A";
+	      }
+	    });
+	}
+
+  </script>
+
+</body>
+</html>
