@@ -26,7 +26,7 @@ If you just want to “flip channels” and land on *The Simpsons* or a random o
 
 ```bash
 # 1. Clone this repo
-git clone https://github.com/yourname/community-channel-99.git
+git clone https://github.com/alexandersshen/community-channel-99.git
 cd community-channel-99
 
 # 2. Install requirements
@@ -102,6 +102,13 @@ Channels are defined in **channels.json**:
     "path": "media/cartoons",
     "rotation": "random",
     "commercials": true
+  },
+  {
+    "id": "commercials",
+    "name": "Commercials",
+    "path": "media/commercials",
+    "rotation": "random",
+    "commercials": false
   }
 ]
 ```
@@ -114,7 +121,8 @@ Channels are defined in **channels.json**:
   - `"random"` → shuffled once and then fixed  
 - `commercials`:  
   - `true` → interleave ads from `media/commercials`  
-  - `false` → shows only, no ads  
+  - `false` → shows only, no ads
+  - this folder is required to append commercials between programs, so make sure there are files in here for that feature to work  
 
 ---
 
