@@ -13,6 +13,13 @@
       "rotation": "random",
       "path": "media/movies",
 	  "commercials": false
+    },
+    {
+      "id": "commercials",
+      "name": "Commercials",
+      "rotation": "random",
+      "path": "media/commercials",
+	  "commercials": false
     }
   ]
 }
