@@ -14,5 +14,43 @@
 	    {% endfor %}
 	  </div>
 	 </div>
+	 
+	 <br />
+	 <button id="refresh-btn" class="refresh-button">Refresh Channels</button>
+
+	 <script>
+		 function showNotification(message, isError = false) {
+		   const notif = document.getElementById("notification");
+		   notif.textContent = message;
+
+		   // Set color based on success/failure
+		   notif.style.background = isError ? "#f44336" : "#4caf50"; // red for error, green for success
+
+		   notif.classList.add("show");
+
+		   // Hide after 3 seconds
+		   setTimeout(() => {
+		     notif.classList.remove("show");
+		   }, 3000);
+		 }
+
+		 document.getElementById("refresh-btn").addEventListener("click", () => {
+		   fetch("/refresh", { method: "POST" })
+		     .then(res => res.json())
+		     .then(data => {
+		       if (data.status === "ok") {
+		         showNotification("✅ Playlists refreshed!");
+		         // reload after a small delay so the user sees it
+		         setTimeout(() => window.location.reload(), 1500);
+		       } else {
+		         showNotification("❌ Refresh failed: " + data.message, true);
+		       }
+		     })
+		     .catch(err => showNotification("❌ Refresh error: " + err, true));
+		 });
+	 </script>
+	 
+	 <div id="notification">Playlists refreshed!</div>
+
 </body>
 </html>

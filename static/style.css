@@ -223,6 +223,44 @@ body.remote-mode {
   font-weight: bold;
 }
 
+.refresh-button {
+  display: inline-block;
+  background: #004d99;   /* blue tone so it stands out */
+  color: #fff;
+  padding: 10px 20px;
+  margin: 10px 0;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border: none;          /* since it's a <button> */
+}
 
+.refresh-button:hover {
+  background: #0066cc;
+}
+
+#notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;   /* green = success */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  font-family: sans-serif;
+  z-index: 1000;
+}
+
+#notification.show {
+  opacity: 1;
+}
 
 

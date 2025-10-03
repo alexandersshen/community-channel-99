@@ -346,6 +346,37 @@ def metadata(filename):
     # Return metadata about the file as JSON
     return jsonify(get_file_metadata(filepath))
 
+# Add a new way so you can refresh the channels without refreshing
+# the whole server again.
+@app.route("/refresh", methods=["POST"])
+def refresh():
+    global CHANNELS, PLAYLISTS
+
+    try:
+        with open("channels.json") as f:
+            data = json.load(f)
+
+        # Unwrap top-level "channels" if present
+        CHANNELS = data["channels"] if "channels" in data else data
+
+        # Reset and rebuild playlists
+        PLAYLISTS = {}
+        for ch in CHANNELS:
+            playlist = build_playlist(ch)
+            PLAYLISTS[ch["id"]] = playlist
+
+            # Print playlist info for this channel
+            print(f"\n📺 Refreshed Channel: {ch['name']} ({ch['id']})")
+            for i, f in enumerate(playlist, start=1):
+                print(f"  {i:02d}. {os.path.basename(f)}")
+
+        print("\n✅ Channels and playlists refreshed.")
+        return {"status": "ok", "message": "Playlists refreshed."}
+
+    except Exception as e:
+        print(f"❌ Refresh failed: {e}")
+        return {"status": "error", "message": str(e)}, 500
+
 # ========== SETUP ON PORT 5050 ===============
 # Run the Flask app on all interfaces so it's reachable
 # across your local network, using port 5050
